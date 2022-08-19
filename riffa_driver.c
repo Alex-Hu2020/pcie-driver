@@ -446,7 +446,7 @@ static inline struct sg_mapping * fill_sg_buf(struct fpga_state * sc, int chnl,
 		}
 
 		// Page in the user pages.
-		down_read(&current->mm->mmap_sem);
+		down_read(&current->mm->mmap_lock);
 		#if LINUX_VERSION_CODE < KERNEL_VERSION(4,6,0)
 		num_pages = get_user_pages(current, current->mm, udata, num_pages_reqd, 1, 0, pages, NULL);
 		#elsif LINUX_VERSION_CODE < KERNEL_VERSION(4,9,0)
@@ -454,7 +454,7 @@ static inline struct sg_mapping * fill_sg_buf(struct fpga_state * sc, int chnl,
 		#else
 		num_pages = get_user_pages(udata, num_pages_reqd, FOLL_WRITE, pages, NULL);
 		#endif
-		up_read(&current->mm->mmap_sem);
+		up_read(&current->mm->mmap_lock);
 		if (num_pages <= 0) {
 			printk(KERN_ERR "riffa: fpga:%d chnl:%d, %s unable to pin any pages in memory\n", sc->id, chnl, dir);
 			kfree(pages);
